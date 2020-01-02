@@ -1,11 +1,10 @@
 const Discord = require('discord.js');
-var fp = require('lodash-fp');
-
-const client = new Discord.Client();
+const fp = require('lodash-fp');
 
 require('dotenv').config()
-const AUTH_TOKEN = process.env.AUTH_TOKEN;
 
+const client = new Discord.Client();
+const AUTH_TOKEN = process.env.AUTH_TOKEN;
 const PREFIX = '!';
 const hasPrefix = fp.startsWith(PREFIX);
 
@@ -31,9 +30,14 @@ client.on('message', async msg => {
     await msg.channel.send('What raid would you like to start?');
 
     collector.on('collect', async m => {
-      await msg.channel.send(`Creating raid for ${m.content}! What are the rules for this raid?`);
+      const raidName = m.content;
+      await msg.channel.send(`Creating raid for ${raidName}! What are the rules for this raid?`);
+
       const collected = await msg.channel.awaitMessages(filter, { maxMatches: 1, time: 10000 });
-      await msg.channel.send(`Cool. The rules are ${collected.first()}.`);
+      const raidRules = collected.first();
+      const message = await msg.channel.send(`Hey, ${collected.first().author} is hosting ${raidName}. The rules are as follows: ${raidRules}`);
+
+      message.pin();
     });
   }
 });
