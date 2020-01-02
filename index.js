@@ -19,7 +19,7 @@ client.on('message', msg => {
   }
 });
 
-client.on('message', msg => {
+client.on('message', async msg => {
   if (!hasPrefix(msg.content)) return;
 
   let args = msg.content.substring(PREFIX.length).split(' ');
@@ -28,37 +28,13 @@ client.on('message', msg => {
     const filter = m => fp.isEqual(m.author.id, msg.author.id);
     const collector = msg.channel.createMessageCollector(filter, { maxMatches: 1, time: 10000 });
 
-    msg.channel.send('What raid would you like to start?');
+    await msg.channel.send('What raid would you like to start?');
 
-    collector.on('collect', m => {
-      msg.channel.send(`Creating raid for ${m.content}! What are the rules for this raid?`)
-        .then(() => {
-          msg.channel.awaitMessages(filter, { maxMatches: 1, time: 10000 })
-            .then(collected => {
-              msg.channel.send(`Cool. The rules are ${collected.first()}.`)
-            })
-        });
-
-        // .then((msg) => {
-        //   msg.react("👍")
-        //   msg.react("👎")
-        //   message.pin()
-        //   message.delete()
-        // }).catch(function() {
-        //   //Something
-        // });
-
-        // const filter = (reaction, user) => {
-        //   return reaction.emoji.name === '👍' && user.id === message.author.id;
-        // };
-
-        // msg.awaitReactions(filter, { max: 1 })
-        //   .then(collected => msg.channel.send('Alright, what are the rules?'));
+    collector.on('collect', async m => {
+      await msg.channel.send(`Creating raid for ${m.content}! What are the rules for this raid?`);
+      const collected = await msg.channel.awaitMessages(filter, { maxMatches: 1, time: 10000 });
+      await msg.channel.send(`Cool. The rules are ${collected.first()}.`);
     });
-
-    // collector.on('end', m => {
-    //   msg.channel.send('Would you like to create rules for this raid?');
-    // });
   }
 });
 
