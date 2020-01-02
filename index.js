@@ -9,8 +9,14 @@ client.on('ready', () => {
 });
 
 client.on('message', msg => {
-  if (msg.content === 'ping <3') {
+  if (msg.content === 'ping') {
     msg.reply('pong <3');
+  }
+});
+
+client.on('message', msg => {
+  if (msg.content.toLowerCase().match(/senpai/)) {
+    msg.reply('<3');
   }
 });
 
