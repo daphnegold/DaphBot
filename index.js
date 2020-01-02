@@ -8,6 +8,8 @@ const AUTH_TOKEN = process.env.AUTH_TOKEN;
 const PREFIX = '!';
 const hasPrefix = fp.startsWith(PREFIX);
 
+var pinMapHack = { };
+
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}! Ready Freddy!`);
 });
@@ -37,8 +39,28 @@ client.on('message', async msg => {
       const raidRules = collected.first();
       const message = await msg.channel.send(`Hey, ${collected.first().author} is hosting ${raidName}. The rules are as follows: ${raidRules}`);
 
+      pinMapHack[collected.first().author.id] = message;
       message.pin();
     });
+  }
+});
+
+client.on('message', async msg => {
+  if (!hasPrefix(msg.content)) return;
+
+  let args = msg.content.substring(PREFIX.length).split(' ');
+
+  if (fp.isEqual(fp.head(args), 'removeraid')) {
+    const message = pinMapHack[msg.author.id];
+
+    if (!message) {
+      await msg.channel.send('You do not have any raids currently running.');
+      return;
+    }
+
+    await msg.channel.send(`Unpinning "${message}"`);
+    message.unpin();
+    pinMapHack[msg.author.id] = null;
   }
 });
 
