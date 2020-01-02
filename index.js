@@ -20,14 +20,19 @@ client.on('message', msg => {
 });
 
 client.on('message', msg => {
-  const content = msg.content;
+  if (!hasPrefix(msg.content)) return;
 
-  if (!hasPrefix(content)) return;
-
-  let args = content.substring(PREFIX.length).split(' ');
+  let args = msg.content.substring(PREFIX.length).split(' ');
 
   if (fp.isEqual(fp.head(args), 'startraid')) {
-    msg.reply('what raid would you like to start?')
+    const filter = m => fp.isEqual(m.author.id, msg.author.id);
+    const collector = msg.channel.createMessageCollector(filter, { time: 10000, maxMatches: 1 });
+
+    msg.channel.send('What raid would you like to start?');
+
+    collector.on('collect', m => {
+      msg.channel.send(`Created raid for ${m.content}!`);
+    });
   }
 });
 
