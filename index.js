@@ -26,6 +26,11 @@ client.on('message', async msg => {
   let args = msg.content.substring(PREFIX.length).split(' ');
 
   if (fp.isEqual(fp.head(args), 'startraid')) {
+    if (pinMapHack[msg.author.id]) {
+      await msg.channel.send('You already have a raid going.');
+      return;
+    }
+
     const filter = m => fp.isEqual(m.author.id, msg.author.id);
     const collector = msg.channel.createMessageCollector(filter, { maxMatches: 1, time: 10000 });
 
